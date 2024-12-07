@@ -5,6 +5,7 @@ public class VRControlSystem : MonoBehaviour {
     // player
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject playerModel;
+    [SerializeField] private Rigidbody playerRB;
     
     [SerializeField] private GameObject camera;
     
@@ -26,7 +27,7 @@ public class VRControlSystem : MonoBehaviour {
     private void Start() {
         // initialise rotations and positions
         camera.transform.rotation = InputTracking.GetLocalRotation(XRNode.Head);
-        playerModel.transform.position = camera.transform.position;
+        camera.transform.position = playerModel.transform.position;
         playerModel.transform.rotation = Quaternion.Euler(0, camera.transform.rotation.y, 0);
 
         leftController.transform.position = InputTracking.GetLocalPosition(XRNode.LeftHand);
@@ -57,22 +58,25 @@ public class VRControlSystem : MonoBehaviour {
         rightController.transform.position = InputTracking.GetLocalPosition(XRNode.RightHand);
         leftController.transform.rotation = InputTracking.GetLocalRotation(XRNode.LeftHand);
         rightController.transform.rotation = InputTracking.GetLocalRotation(XRNode.RightHand);
-        
+    }
+
+    private void FixedUpdate() {
         // movement
         joystickResult.x = Input.GetAxis("Horizontal");
         joystickResult.y = Input.GetAxis("Vertical");
         
         if (joystickResult.x != 0 || joystickResult.y != 0) {MovePlayer(joystickResult);}
         if (Input.GetKeyDown(jumpButton)) {JumpPlayer();}
-        
     }
 
     private void MovePlayer(Vector2 moveVector) {
+        Vector3 forceVector = new Vector3(moveVector.x, 0, moveVector.y);
         
+        playerRB.AddForce(forceVector * moveSpeed);
     }
 
     private void JumpPlayer() {
-        
+        playerRB.AddForce(transform.up * jumpForce);
     }
     
 }

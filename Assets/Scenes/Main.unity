@@ -430,9 +430,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 1094735999}
   playerModel: {fileID: 2014200502}
+  playerRB: {fileID: 2014200507}
   camera: {fileID: 1239789083}
   leftController: {fileID: 1137779403}
   rightController: {fileID: 1331365372}
+  jumpButton: 330
+  moveSpeed: 5
+  jumpForce: 5
 --- !u!1 &1137779403
 GameObject:
   m_ObjectHideFlags: 0
