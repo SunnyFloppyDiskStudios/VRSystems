@@ -12,13 +12,10 @@ public class VRControlSystem : MonoBehaviour {
 
     private Vector2 joystickResult;
     
-    private FixedPoint joystickX;
-    private FixedPoint joystickY;
+    private float joystickX;
+    private float joystickY;
     
     void Start() {
-        joystickX = new FixedPoint(-1f, 1f, 0.125f);
-        joystickY = new FixedPoint(-1f, 1f, 0.125f);
-        
         camera.transform.rotation = InputTracking.GetLocalRotation(XRNode.Head);
         playerModel.transform.position = camera.transform.position;
         playerModel.transform.rotation = Quaternion.Euler(0, camera.transform.rotation.y, 0);
