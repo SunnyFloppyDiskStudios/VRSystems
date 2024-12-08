@@ -36,12 +36,18 @@ public class VRControlSystem : MonoBehaviour {
     private void FixedUpdate() {
         MovePlayer();
         if (Input.GetKey(jumpButton)) {JumpPlayer();}
+        
+        print(playerRB.linearVelocity);
     }
 
     private void MovePlayer() {
         // movement
         joystickResult.x = Input.GetAxis("Horizontal");
         joystickResult.y = Input.GetAxis("Vertical");
+
+        if (joystickResult.x == 0 || joystickResult.y == 0) {
+            playerRB.linearVelocity = Vector2.zero;
+        }
         
         playerRB.AddForce(transform.right * (joystickResult.x * moveSpeed));
         playerRB.AddForce(transform.forward * (joystickResult.y * moveSpeed));
