@@ -7,6 +7,7 @@ public class VRControlSystem : MonoBehaviour {
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject playerModel;
     [SerializeField] private Rigidbody playerRB;
+    [SerializeField] private GameObject groundCheck;
     
     [SerializeField] private new GameObject camera;
     
@@ -25,29 +26,6 @@ public class VRControlSystem : MonoBehaviour {
     public float moveSpeed = 5f;
     public float jumpForce = 50f;
     
-    private void Start() {
-        // initialise rotations and positions
-        camera.transform.rotation = Quaternion.identity;
-        camera.transform.position = playerModel.transform.position;
-        playerModel.transform.rotation = Quaternion.identity;
-
-        leftControllerObject.transform.position = Vector3.zero;
-        rightControllerObject.transform.position = Vector3.zero;
-    }
-
-    private void ResetPosition() {
-        Vector3 resetPos = Vector3.zero;
-        Quaternion resetRot = Quaternion.identity;
-
-        foreach (Transform child in playerPrefab.transform) {
-            child.position = resetPos;
-            child.rotation = resetRot;
-        }
-        
-        playerPrefab.transform.position = resetPos;
-        playerPrefab.transform.rotation = resetRot;
-    }
-    
     private void Update() {
         Quaternion headsetRotation = InputTracking.GetLocalRotation(XRNode.Head);
         camera.transform.rotation = headsetRotation;
@@ -57,7 +35,7 @@ public class VRControlSystem : MonoBehaviour {
 
     private void FixedUpdate() {
         MovePlayer();
-        if (Input.GetKeyDown(jumpButton)) {JumpPlayer();}
+        if (Input.GetKey(jumpButton)) {JumpPlayer();}
     }
 
     private void MovePlayer() {
@@ -70,6 +48,10 @@ public class VRControlSystem : MonoBehaviour {
     }
 
     private void JumpPlayer() {
-        playerRB.AddForce(transform.up * jumpForce);
+        bool isGrounded = Physics.CheckSphere(groundCheck.transform.position, 0.2f);
+
+        if (isGrounded) {
+            playerRB.AddForce(transform.up * jumpForce);
+        }
     }
 }
