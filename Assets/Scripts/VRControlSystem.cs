@@ -23,7 +23,7 @@ public class VRControlSystem : MonoBehaviour {
     
     // forces
     public float moveSpeed = 5f;
-    public float jumpForce = 5f;
+    public float jumpForce = 50f;
     
     private void Start() {
         // initialise rotations and positions
@@ -51,7 +51,7 @@ public class VRControlSystem : MonoBehaviour {
     private void Update() {
         Quaternion headsetRotation = InputTracking.GetLocalRotation(XRNode.Head);
         camera.transform.rotation = headsetRotation;
-        playerModel.transform.position = playerRB.transform.position;
+        camera.transform.position = playerRB.transform.position;
         playerModel.transform.rotation = Quaternion.Euler(0, headsetRotation.eulerAngles.y, 0);
     }
 
