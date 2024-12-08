@@ -51,22 +51,22 @@ public class VRControlSystem : MonoBehaviour {
     private void Update() {
         Quaternion headsetRotation = InputTracking.GetLocalRotation(XRNode.Head);
         camera.transform.rotation = headsetRotation;
+        playerModel.transform.position = playerRB.transform.position;
         playerModel.transform.rotation = Quaternion.Euler(0, headsetRotation.eulerAngles.y, 0);
     }
 
     private void FixedUpdate() {
+        MovePlayer();
+        if (Input.GetKeyDown(jumpButton)) {JumpPlayer();}
+    }
+
+    private void MovePlayer() {
         // movement
         joystickResult.x = Input.GetAxis("Horizontal");
         joystickResult.y = Input.GetAxis("Vertical");
         
-        MovePlayer(joystickResult);
-        if (Input.GetKeyDown(jumpButton)) {JumpPlayer();}
-    }
-
-    private void MovePlayer(Vector2 moveVector) {
-        Vector3 forceVector = new Vector3(moveVector.x, 0, moveVector.y);
-        
-        playerRB.AddForce(forceVector * moveSpeed);
+        playerRB.AddForce(transform.right * (joystickResult.x * moveSpeed));
+        playerRB.AddForce(transform.forward * (joystickResult.y * moveSpeed));
     }
 
     private void JumpPlayer() {
