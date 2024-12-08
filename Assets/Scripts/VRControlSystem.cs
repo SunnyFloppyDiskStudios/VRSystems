@@ -12,11 +12,6 @@ public class VRControlSystem : MonoBehaviour {
     
     [SerializeField] private GameObject leftControllerObject;
     [SerializeField] private GameObject rightControllerObject;
-
-    // devices
-    public InputDevice leftController;
-    public InputDevice rightController;
-    public InputDevice playerHeadset;
     
     public KeyCode jumpButton = KeyCode.JoystickButton0;
 
@@ -29,35 +24,8 @@ public class VRControlSystem : MonoBehaviour {
     // forces
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
-
-    // Initialise all player devices
-    private void InitialiseInputDevices() {
-        if (!leftController.isValid) {
-            InitialiseInputDevice(InputDeviceCharacteristics.Controller | InputDeviceCharacteristics.Left, ref leftController);
-        }
-        if (!rightController.isValid) {
-            InitialiseInputDevice(InputDeviceCharacteristics.Controller | InputDeviceCharacteristics.Right, ref rightController);
-        }
-        if (!playerHeadset.isValid) {
-            InitialiseInputDevice(InputDeviceCharacteristics.HeadMounted, ref playerHeadset);
-        }
-    }
-
-    // Initialise device as it's loaded
-    private void InitialiseInputDevice(InputDeviceCharacteristics characteristics, ref InputDevice inputDevice) {
-        List<InputDevice> devices = new List<InputDevice>();
-        
-        InputDevices.GetDevicesWithCharacteristics(characteristics, devices);
-
-        if (devices.Count == 0) {
-            inputDevice = devices[0];
-        }
-    }
     
     private void Start() {
-        // Initialise controllers and HMD
-        InitialiseInputDevices();
-        
         // initialise rotations and positions
         camera.transform.rotation = Quaternion.identity;
         camera.transform.position = playerModel.transform.position;
@@ -81,31 +49,9 @@ public class VRControlSystem : MonoBehaviour {
     }
     
     private void Update() {
-        // player body/look
-        if (playerHeadset.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion headsetR))
-        {
-            camera.transform.rotation = headsetR;
-        }
-        
-        camera.transform.position = playerModel.transform.position;
-        playerModel.transform.rotation = Quaternion.Euler(0, camera.transform.rotation.y, 0);
-        
-        // controllers
-        if (leftController.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 leftCP)) {
-            leftControllerObject.transform.position = leftCP;
-        }
-
-        if (rightController.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 rightCP)) {
-            rightControllerObject.transform.position = rightCP;
-        }
-
-        if (leftController.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion leftCR)) {
-            leftControllerObject.transform.rotation = leftCR;
-        }
-        
-        if (leftController.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rightCR)) {
-            rightControllerObject.transform.rotation = rightCR;
-        }
+        Quaternion headsetRotation = InputTracking.GetLocalRotation(XRNode.Head);
+        camera.transform.rotation = headsetRotation;
+        playerModel.transform.rotation = Quaternion.Euler(0, headsetRotation.eulerAngles.y, 0);
     }
 
     private void FixedUpdate() {
@@ -113,7 +59,7 @@ public class VRControlSystem : MonoBehaviour {
         joystickResult.x = Input.GetAxis("Horizontal");
         joystickResult.y = Input.GetAxis("Vertical");
         
-        if (joystickResult.x != 0 || joystickResult.y != 0) {MovePlayer(joystickResult);}
+        MovePlayer(joystickResult);
         if (Input.GetKeyDown(jumpButton)) {JumpPlayer();}
     }
 
